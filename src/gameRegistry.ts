@@ -31,7 +31,7 @@ export const games: GameMetadata[] = [
     id: 'memory',
     title: 'Pokémon Match',
     description: 'Find all the Pokémon pairs!',
-    pokemonId: 25,        // Pikachu
+    pokemonId: 39,        // Jigglypuff
     path: '/game/memory',
     gradient: 'from-blue-500 to-blue-800',
     bgVariant: 'water',
@@ -49,7 +49,7 @@ export const games: GameMetadata[] = [
     id: 'quiz',
     title: "Who's That Pokémon?",
     description: 'Guess the Pokémon from its silhouette!',
-    pokemonId: 25,        // Pikachu
+    pokemonId: 54,        // Psyduck
     path: '/game/quiz',
     gradient: 'from-yellow-400 to-amber-600',
     bgVariant: 'sky',

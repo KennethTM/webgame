@@ -61,8 +61,8 @@ const Home = () => {
           </div>
         </header>
 
-        {/* Game cards — 2-column grid for kid-friendly large cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+        {/* Game cards — 3-column grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
           {games.map((game) => (
             <Link
               key={game.id}
@@ -70,8 +70,8 @@ const Home = () => {
               className={`
                 group relative bg-gradient-to-br ${game.gradient}
                 rounded-2xl shadow-xl overflow-hidden
-                flex flex-col items-center p-6
-                min-h-[200px] text-white
+                flex flex-col items-center p-4
+                min-h-[170px] text-white
                 transition-transform duration-200
                 hover:scale-105 active:scale-95
                 border-2 border-white/10 hover:border-pokemon-yellow/40
@@ -86,18 +86,18 @@ const Home = () => {
                 {[1, 2, 3].map(s => (
                   <span
                     key={s}
-                    className={`text-sm ${(scores[game.id]?.bestStars ?? 0) >= s ? 'text-pokemon-yellow drop-shadow-[0_0_4px_rgba(255,222,0,0.6)]' : 'text-white/20'}`}
+                    className={`text-xs ${(scores[game.id]?.bestStars ?? 0) >= s ? 'text-pokemon-yellow drop-shadow-[0_0_4px_rgba(255,222,0,0.6)]' : 'text-white/20'}`}
                   >
                     &#9733;
                   </span>
                 ))}
               </div>
 
-              <SpriteImage pokemonId={game.pokemonId} size={96} className="mb-3 drop-shadow-lg group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,0.4)] transition-all" />
-              <h2 className="font-pixel text-sm mb-2 text-center">{game.title}</h2>
-              <p className="text-center text-sm opacity-90 leading-relaxed">{game.description}</p>
+              <SpriteImage pokemonId={game.pokemonId} size={72} className="mb-2 drop-shadow-lg group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,0.4)] transition-all" />
+              <h2 className="font-pixel text-[11px] mb-1.5 text-center leading-tight">{game.title}</h2>
+              <p className="text-center text-xs opacity-90 leading-snug">{game.description}</p>
 
-              {/* Bottom PokéBall divider */}
+              {/* Bottom divider */}
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
             </Link>
           ))}
