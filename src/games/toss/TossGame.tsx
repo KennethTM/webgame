@@ -9,8 +9,8 @@ import { useGameActive } from '../../hooks/useGameActive';
 
 const TOTAL_ROUNDS = 5;
 const MAX_ATTEMPTS = 3;
-const CHARGE_CYCLE_MS = 2000; // power loops 0→100 in 2s
-const SWEET_SPOT_HALF = 12;   // ±12 units of tolerance
+const CHARGE_CYCLE_MS = 2500; // power ping-pongs 0→100→0 in 2.5s
+const SWEET_SPOT_HALF = 15;   // ±15 units of tolerance
 
 // Pick 5 unique Pokémon for the 5 rounds at game start
 function pickLineup(): { pokemon: PokemonEntry; distance: number }[] {
@@ -71,7 +71,9 @@ const TossGame = () => {
     chargeStartRef.current = performance.now();
     const tick = () => {
       const elapsed = performance.now() - chargeStartRef.current;
-      const p = ((elapsed % CHARGE_CYCLE_MS) / CHARGE_CYCLE_MS) * 100;
+      // Triangle wave: 0→100→0 smoothly (no jarring reset)
+      const t = (elapsed % CHARGE_CYCLE_MS) / CHARGE_CYCLE_MS;
+      const p = t <= 0.5 ? t * 200 : (1 - t) * 200;
       powerRef.current = p;
       setPower(p);
       chargeRef.current = requestAnimationFrame(tick);
@@ -267,7 +269,7 @@ const TossGame = () => {
 
             {/* Power meter (right side) */}
             {phase === 'aiming' && (
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-52 bg-gray-800/50 rounded-full overflow-hidden border-3 border-white/40 flex flex-col-reverse shadow-lg">
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-52 bg-gray-800/50 rounded-full overflow-hidden border-3 border-white/40 shadow-lg">
                 {/* Sweet spot zone */}
                 <div
                   className="absolute w-full bg-green-400/50 border-y-3 border-green-400"
@@ -278,9 +280,9 @@ const TossGame = () => {
                 >
                   <span className="absolute -left-8 top-1/2 -translate-y-1/2 font-pixel text-[9px] text-green-300">AIM</span>
                 </div>
-                {/* Power fill */}
+                {/* Power fill — absolute positioned, no flex, no CSS transition */}
                 <div
-                  className="w-full bg-gradient-to-t from-pokemon-red to-pokemon-yellow transition-all duration-75 rounded-b-full"
+                  className="absolute bottom-0 w-full bg-gradient-to-t from-pokemon-red to-pokemon-yellow rounded-b-full"
                   style={{ height: `${power}%` }}
                 />
               </div>
