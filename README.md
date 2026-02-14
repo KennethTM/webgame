@@ -2,6 +2,8 @@
 
 A collection of Pokémon-themed web games for kids. Built with React 19, TypeScript, Tailwind CSS 4, and Vite 7.
 
+**Play now:** [https://kennethtm.github.io/webgame/](https://kennethtm.github.io/webgame/)
+
 ## Commands
 
 ```bash
