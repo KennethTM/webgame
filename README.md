@@ -1,47 +1,29 @@
 # Pokémon Web Arcade
 
-A collection of simple, Pokémon-themed web games for kids. Built with React, TypeScript, and Tailwind CSS.
+A collection of Pokémon-themed web games for kids. Built with React 19, TypeScript, Tailwind CSS 4, and Vite 7.
 
-## Setup & Development
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-## Build & Deployment
+## Commands
 
 ```bash
-# Build for production (output in /dist)
-npm run build
-
-# Preview production build locally
-npm run preview
+npm install       # Install dependencies
+npm run dev       # Start dev server (localhost:5173)
+npm run build     # TypeScript check + production build → /dist
+npm run preview   # Preview production build locally
+npm run lint      # Run ESLint
 ```
 
-### Deploy to GitHub Pages
+## Deploy to GitHub Pages
 
-1. Install the deployment package:
-   ```bash
-   npm install -D gh-pages
-   ```
+Pushes to `main` auto-deploy via GitHub Actions (`.github/workflows/deploy.yml`).
 
-2. Add these scripts to `package.json`:
-   ```json
-   "predeploy": "npm run build",
-   "deploy": "gh-pages -d dist"
-   ```
+One-time setup: go to repo **Settings → Pages → Source** and select **GitHub Actions**.
 
-3. Deploy:
-   ```bash
-   npm run deploy
-   ```
+## Games
 
-## Games Included
-- **PokéSnake**: Classic snake game with Ekans.
-- **PokéBall Maze**: Pac-Man style maze game.
-- **Pokémon Match**: Memory card matching.
-- **Magikarp Jump**: High-speed button mashing.# webgame
+- **PokéSnake** — Help Ekans eat berries and grow
+- **PokéBall Maze** — Pac-Man style maze with Gastly ghosts
+- **Pokémon Match** — Memory card matching
+- **Magikarp Jump** — Tap to power up and jump
+- **Who's That Pokémon?** — Silhouette guessing quiz
+- **PokéBall Toss** — Catch wild Pokémon with timed throws
+- **PokéRun** — Endless runner with Pikachu
