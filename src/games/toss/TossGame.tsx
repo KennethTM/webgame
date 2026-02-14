@@ -11,6 +11,7 @@ const TOTAL_ROUNDS = 5;
 const MAX_ATTEMPTS = 3;
 const CHARGE_CYCLE_MS = 2500; // power ping-pongs 0→100→0 in 2.5s
 const SWEET_SPOT_HALF = 15;   // ±15 units of tolerance
+const TOUCH_GUARD_MS = 400;
 
 // Pick 5 unique Pokémon for the 5 rounds at game start
 function pickLineup(): { pokemon: PokemonEntry; distance: number }[] {
@@ -40,6 +41,7 @@ const TossGame = () => {
   const chargeStartRef = useRef(0);
   const powerRef = useRef(0); // tracks real-time power for throwBall
   const isCharging = useRef(false);
+  const lastTouchRef = useRef(0);
 
   const { best, submitScore } = useHighScore('toss');
   const { setGameActive } = useGameActive();
@@ -292,11 +294,12 @@ const TossGame = () => {
           {/* Hold-to-charge button with power ring */}
           {phase === 'aiming' && (
             <div
-              className="mt-5 relative w-40 h-40 flex items-center justify-center cursor-pointer touch-manipulation"
-              onMouseDown={startCharge}
-              onMouseUp={releaseCharge}
-              onTouchStart={(e) => { e.preventDefault(); startCharge(); }}
-              onTouchEnd={(e) => { e.preventDefault(); releaseCharge(); }}
+              className="mt-5 relative w-40 h-40 flex items-center justify-center cursor-pointer touch-none"
+              onTouchStart={(e) => { e.preventDefault(); lastTouchRef.current = Date.now(); startCharge(); }}
+              onTouchEnd={(e) => { e.preventDefault(); lastTouchRef.current = Date.now(); releaseCharge(); }}
+              onMouseDown={() => { if (Date.now() - lastTouchRef.current > TOUCH_GUARD_MS) startCharge(); }}
+              onMouseUp={() => { if (Date.now() - lastTouchRef.current > TOUCH_GUARD_MS) releaseCharge(); }}
+              onContextMenu={(e) => e.preventDefault()}
             >
               {/* Power ring */}
               <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 160 160">

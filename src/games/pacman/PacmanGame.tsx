@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import SpriteImage from '../../components/SpriteImage';
 import PokeBall from '../../components/PokeBall';
 import DPad from '../../components/DPad';
@@ -9,6 +9,8 @@ import { useHighScore } from '../../hooks/useHighScore';
 import { useGameActive } from '../../hooks/useGameActive';
 
 const GRID_SIZE = 15;
+const MOVE_INTERVAL = 200; // ms per auto-move tick
+
 // 0: empty, 1: wall, 2: candy, 3: master ball
 const INITIAL_MAZE = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -28,6 +30,8 @@ const INITIAL_MAZE = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
+interface Dir { dx: number; dy: number }
+
 const PacmanGame = () => {
   const [player, setPlayer] = useState({ x: 7, y: 11 });
   const [ghosts, setGhosts] = useState([
@@ -43,13 +47,26 @@ const PacmanGame = () => {
   const { setGameActive } = useGameActive();
   const stars = score >= 500 ? 3 : score >= 200 ? 2 : score >= 50 ? 1 : 0;
 
-  // Win condition — derived from maze state (no candy or master balls left)
+  // Refs for continuous movement (avoid stale closures in interval)
+  const directionRef = useRef<Dir | null>(null);
+  const playerRef = useRef({ x: 7, y: 11 });
+  const mazeRef = useRef(INITIAL_MAZE);
+  const gameOverRef = useRef(false);
+  const isWonRef = useRef(false);
+
+  // Win condition
   const isWon = score > 0 && !maze.some(row => row.some(cell => cell === 2 || cell === 3));
+
+  // Keep refs in sync with state
+  useEffect(() => { playerRef.current = player; }, [player]);
+  useEffect(() => { mazeRef.current = maze; }, [maze]);
+  useEffect(() => { gameOverRef.current = gameOver; }, [gameOver]);
+  useEffect(() => { isWonRef.current = isWon; }, [isWon]);
 
   // Vibrate on victory
   useEffect(() => { if (isWon) vibrateVictory(); }, [isWon]);
 
-  // Signal game active for back-button protection
+  // Signal game active
   useEffect(() => { setGameActive(score > 0 && !gameOver && !isWon); return () => setGameActive(false); }, [score, gameOver, isWon, setGameActive]);
 
   // Submit score on game end
@@ -57,37 +74,58 @@ const PacmanGame = () => {
     if ((gameOver || isWon) && score > 0) submitScore(score, stars);
   }, [gameOver, isWon, score, stars, submitScore]);
 
-  const movePlayer = useCallback((dx: number, dy: number) => {
+  // Set direction (input handler — does not directly move)
+  const setDirection = useCallback((dx: number, dy: number) => {
+    directionRef.current = { dx, dy };
+  }, []);
+
+  // Continuous auto-movement loop
+  useEffect(() => {
     if (gameOver || isWon) return;
 
-    const newX = player.x + dx;
-    const newY = player.y + dy;
+    const interval = setInterval(() => {
+      const dir = directionRef.current;
+      if (!dir || gameOverRef.current || isWonRef.current) return;
 
-    let wrappedX = newX;
-    if (newX < 0) wrappedX = GRID_SIZE - 1;
-    if (newX >= GRID_SIZE) wrappedX = 0;
+      const p = playerRef.current;
+      const m = mazeRef.current;
 
-    if (maze[newY] && maze[newY][wrappedX] !== 1) {
-      setPlayer({ x: wrappedX, y: newY });
+      const newX = p.x + dir.dx;
+      const newY = p.y + dir.dy;
 
-      if (maze[newY][wrappedX] === 2) {
-        const newMaze = maze.map(row => [...row]);
-        newMaze[newY][wrappedX] = 0;
-        setMaze(newMaze);
-        setScore(s => s + 10);
+      let wrappedX = newX;
+      if (newX < 0) wrappedX = GRID_SIZE - 1;
+      if (newX >= GRID_SIZE) wrappedX = 0;
+
+      if (m[newY] && m[newY][wrappedX] !== 1) {
+        const pos = { x: wrappedX, y: newY };
+        playerRef.current = pos;
+        setPlayer(pos);
+
+        if (m[newY][wrappedX] === 2) {
+          const newMaze = m.map(row => [...row]);
+          newMaze[newY][wrappedX] = 0;
+          mazeRef.current = newMaze;
+          setMaze(newMaze);
+          setScore(s => s + 10);
+        }
+
+        if (m[newY][wrappedX] === 3) {
+          const newMaze = m.map(row => [...row]);
+          newMaze[newY][wrappedX] = 0;
+          mazeRef.current = newMaze;
+          setMaze(newMaze);
+          setScore(s => s + 50);
+          vibrateSuccess();
+          setPowerTimer(10);
+          setGhosts(prev => prev.map(g => ({ ...g, isVulnerable: true })));
+        }
       }
+      // If wall: player stays put, direction retained (will try again next tick)
+    }, MOVE_INTERVAL);
 
-      if (maze[newY][wrappedX] === 3) {
-        const newMaze = maze.map(row => [...row]);
-        newMaze[newY][wrappedX] = 0;
-        setMaze(newMaze);
-        setScore(s => s + 50);
-        vibrateSuccess();
-        setPowerTimer(10);
-        setGhosts(prev => prev.map(g => ({ ...g, isVulnerable: true })));
-      }
-    }
-  }, [gameOver, isWon, player, maze]);
+    return () => clearInterval(interval);
+  }, [gameOver, isWon]);
 
   // Ghost movement
   useEffect(() => {
@@ -95,10 +133,11 @@ const PacmanGame = () => {
     const interval = setInterval(() => {
       setGhosts(prev => prev.map(ghost => {
         const directions = [{ dx: 1, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: 1 }, { dx: 0, dy: -1 }];
+        const m = mazeRef.current;
         const possible = directions.filter(d => {
           const nx = ghost.x + d.dx;
           const ny = ghost.y + d.dy;
-          return maze[ny] && maze[ny][nx] !== 1;
+          return m[ny] && m[ny][nx] !== 1;
         });
         if (possible.length === 0) return ghost;
         const move = possible[Math.floor(Math.random() * possible.length)];
@@ -106,7 +145,7 @@ const PacmanGame = () => {
       }));
     }, 500);
     return () => clearInterval(interval);
-  }, [maze, gameOver, isWon]);
+  }, [gameOver, isWon]);
 
   // Collision check
   useEffect(() => {
@@ -138,39 +177,44 @@ const PacmanGame = () => {
     }
   }, [powerTimer]);
 
-  const handleKeyPress = useCallback((e: KeyboardEvent) => {
-    switch (e.key) {
-      case 'ArrowUp': movePlayer(0, -1); break;
-      case 'ArrowDown': movePlayer(0, 1); break;
-      case 'ArrowLeft': movePlayer(-1, 0); break;
-      case 'ArrowRight': movePlayer(1, 0); break;
-    }
-  }, [movePlayer]);
-
+  // Keyboard input — changes direction
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleKeyPress]);
+    const onKey = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'ArrowUp': setDirection(0, -1); break;
+        case 'ArrowDown': setDirection(0, 1); break;
+        case 'ArrowLeft': setDirection(-1, 0); break;
+        case 'ArrowRight': setDirection(1, 0); break;
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [setDirection]);
 
-  // Swipe support for tablet play
+  // Swipe support
   const swipeHandlers = useSwipe(useCallback((dir: 'up' | 'down' | 'left' | 'right') => {
     switch (dir) {
-      case 'up': movePlayer(0, -1); break;
-      case 'down': movePlayer(0, 1); break;
-      case 'left': movePlayer(-1, 0); break;
-      case 'right': movePlayer(1, 0); break;
+      case 'up': setDirection(0, -1); break;
+      case 'down': setDirection(0, 1); break;
+      case 'left': setDirection(-1, 0); break;
+      case 'right': setDirection(1, 0); break;
     }
-  }, [movePlayer]));
+  }, [setDirection]));
 
   const reset = () => {
-    setPlayer({ x: 7, y: 11 });
+    const pos = { x: 7, y: 11 };
+    setPlayer(pos);
+    playerRef.current = pos;
+    directionRef.current = null;
     setGhosts([
       { x: 6, y: 7, spriteId: 92, isVulnerable: false },
       { x: 8, y: 7, spriteId: 93, isVulnerable: false },
     ]);
     setMaze(INITIAL_MAZE);
+    mazeRef.current = INITIAL_MAZE;
     setScore(0);
     setGameOver(false);
+    gameOverRef.current = false;
     setPowerTimer(0);
   };
 
@@ -188,7 +232,7 @@ const PacmanGame = () => {
       {/* Maze */}
       <div
         {...swipeHandlers}
-        className="relative rounded-lg overflow-hidden border-4 border-stone-800 touch-manipulation w-[min(330px,85vw)] aspect-square"
+        className="relative rounded-lg overflow-hidden border-4 border-stone-800 touch-none w-[min(330px,85vw)] aspect-square"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
@@ -268,10 +312,10 @@ const PacmanGame = () => {
 
       {/* D-Pad */}
       <DPad
-        onUp={() => movePlayer(0, -1)}
-        onDown={() => movePlayer(0, 1)}
-        onLeft={() => movePlayer(-1, 0)}
-        onRight={() => movePlayer(1, 0)}
+        onUp={() => setDirection(0, -1)}
+        onDown={() => setDirection(0, 1)}
+        onLeft={() => setDirection(-1, 0)}
+        onRight={() => setDirection(1, 0)}
         accentColor="#705848"
         center={powerTimer > 0 ? <PokeBall size={24} variant="master" spinning /> : undefined}
       />

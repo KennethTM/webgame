@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 
 interface DPadProps {
   onUp: () => void;
@@ -10,7 +10,7 @@ interface DPadProps {
 }
 
 const btnBase =
-  'bg-gray-700 active:bg-gray-500 text-white flex items-center justify-center rounded-lg transition-colors select-none touch-manipulation';
+  'bg-gray-700 active:bg-gray-500 text-white flex items-center justify-center rounded-lg transition-colors select-none touch-none';
 
 const Arrow = ({ d }: { d: string }) => (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -19,9 +19,12 @@ const Arrow = ({ d }: { d: string }) => (
 );
 
 const DPad = ({ onUp, onDown, onLeft, onRight, accentColor, center }: DPadProps) => {
+  const touchedRef = useRef(false);
+
   const handle = (fn: () => void) => ({
-    onTouchStart: (e: React.TouchEvent) => { e.preventDefault(); fn(); },
-    onMouseDown: fn,
+    onTouchStart: (e: React.TouchEvent) => { e.preventDefault(); touchedRef.current = true; fn(); },
+    onMouseDown: () => { if (!touchedRef.current) fn(); },
+    onContextMenu: (e: React.MouseEvent) => e.preventDefault(),
   });
 
   const glowStyle = accentColor

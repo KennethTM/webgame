@@ -149,7 +149,7 @@ const SnakeGame = () => {
       {/* Board */}
       <div
         {...swipeHandlers}
-        className="relative rounded-lg shadow-inner overflow-hidden border-4 border-green-900 touch-manipulation w-[min(330px,85vw)] aspect-square"
+        className="relative rounded-lg shadow-inner overflow-hidden border-4 border-green-900 touch-none w-[min(330px,85vw)] aspect-square"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,

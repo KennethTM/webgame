@@ -5,7 +5,9 @@ import GameOverlay from '../../components/GameOverlay';
 import { useHighScore } from '../../hooks/useHighScore';
 import { useGameActive } from '../../hooks/useGameActive';
 
-const GAME_DURATION = 5000;
+const TOUCH_GUARD_MS = 400;
+
+const GAME_DURATION = 8000;
 
 // Height milestone Pokémon
 const MILESTONES = [
@@ -30,6 +32,7 @@ const JumpGame = () => {
   }, [gameState, setGameActive]);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastTouchRef = useRef(0);
 
   const handleTap = () => {
     if (gameState === 'charging') setTaps(t => t + 1);
@@ -49,7 +52,7 @@ const JumpGame = () => {
         // Inline finishCharging to avoid ordering issues
         setGameState('jumping');
         setTaps(prev => {
-          const h = Math.floor(prev * 1.5 + Math.random() * 5);
+          const h = Math.floor(prev * 2 + Math.random() * 5);
           setHeight(h);
           setTimeout(() => setGameState('finished'), 3000);
           return prev;
@@ -64,8 +67,8 @@ const JumpGame = () => {
     setHeight(0);
   };
 
-  const stars = height >= 50 ? 3 : height >= 30 ? 2 : height >= 10 ? 1 : 0;
-  const showGyarados = height > 50;
+  const stars = height >= 40 ? 3 : height >= 20 ? 2 : height >= 8 ? 1 : 0;
+  const showGyarados = height > 40;
 
   // Submit score on finished
   useEffect(() => {
@@ -82,7 +85,7 @@ const JumpGame = () => {
       </div>
 
       {/* Play area */}
-      <div className="relative w-full h-[400px] bg-gradient-to-b from-orange-300 via-sky-300 to-sky-100 rounded-3xl border-4 border-white/30 shadow-2xl overflow-hidden flex flex-col items-center">
+      <div className="relative w-full h-[520px] bg-gradient-to-b from-orange-300 via-sky-300 to-sky-100 rounded-3xl border-4 border-white/30 shadow-2xl overflow-hidden flex flex-col items-center">
         {/* CSS clouds */}
         {[
           { top: '8%', left: '5%', w: 80, delay: 0 },
@@ -135,7 +138,7 @@ const JumpGame = () => {
         {/* Magikarp */}
         <div
           className={`z-20 transition-all duration-[3000ms] ease-out absolute
-            ${gameState === 'jumping' ? '-translate-y-[320px] scale-125 rotate-[360deg]' :
+            ${gameState === 'jumping' ? '-translate-y-[430px] scale-125 rotate-[360deg]' :
               gameState === 'charging' ? 'animate-shake' : ''}`}
           style={{ bottom: gameState === 'jumping' ? '100px' : '70px' }}
         >
@@ -179,7 +182,7 @@ const JumpGame = () => {
           <GameOverlay
             variant="victory"
             title={`${height}m!`}
-            subtitle={height > 50 ? 'Magikarp evolved!' : 'Not bad for a fish!'}
+            subtitle={height > 40 ? 'Magikarp evolved!' : 'Not bad for a fish!'}
             pokemonId={showGyarados ? 130 : 129}
             stars={stars}
             onAction={reset}
@@ -190,9 +193,10 @@ const JumpGame = () => {
       {/* Tap button during charging */}
       {gameState === 'charging' && (
         <button
-          onMouseDown={handleTap}
-          onTouchStart={(e) => { e.preventDefault(); handleTap(); }}
-          className="mt-6 w-44 h-44 bg-gradient-radial from-pokemon-yellow to-pokemon-gold rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform border-4 border-white/30"
+          onTouchStart={(e) => { e.preventDefault(); lastTouchRef.current = Date.now(); handleTap(); }}
+          onMouseDown={() => { if (Date.now() - lastTouchRef.current > TOUCH_GUARD_MS) handleTap(); }}
+          onContextMenu={(e) => e.preventDefault()}
+          className="mt-6 w-44 h-44 bg-gradient-radial from-pokemon-yellow to-pokemon-gold rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform border-4 border-white/30 touch-none"
         >
           <div className="flex flex-col items-center">
             <PokeBall size={40} />

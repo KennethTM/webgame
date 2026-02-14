@@ -5,6 +5,8 @@ import GameOverlay from '../../components/GameOverlay';
 import { useHighScore } from '../../hooks/useHighScore';
 import { useGameActive } from '../../hooks/useGameActive';
 
+const TOUCH_GUARD_MS = 400;
+
 // --- constants ---
 const GRAVITY = 0.8;
 const JUMP_STRENGTH = -13;
@@ -67,6 +69,7 @@ const RunGame = () => {
     score: 0,
   });
   const loopRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastTouchRef = useRef(0);
 
   const startGame = useCallback(() => {
     const e = engine.current;
@@ -291,9 +294,10 @@ const RunGame = () => {
 
       {gameState === 'playing' && (
         <button
-          onMouseDown={handleJump}
-          onTouchStart={(e) => { e.preventDefault(); handleJump(); }}
-          className="mt-5 w-32 h-32 bg-gradient-to-b from-pokemon-yellow to-pokemon-gold rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform border-4 border-white/30"
+          onTouchStart={(e) => { e.preventDefault(); lastTouchRef.current = Date.now(); handleJump(); }}
+          onMouseDown={() => { if (Date.now() - lastTouchRef.current > TOUCH_GUARD_MS) handleJump(); }}
+          onContextMenu={(e) => e.preventDefault()}
+          className="mt-5 w-32 h-32 bg-gradient-to-b from-pokemon-yellow to-pokemon-gold rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform border-4 border-white/30 touch-none"
         >
           <div className="flex flex-col items-center gap-1">
             <PokeBall size={36} />
