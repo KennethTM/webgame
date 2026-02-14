@@ -10,7 +10,8 @@ import { useGameActive } from '../../hooks/useGameActive';
 const TOTAL_ROUNDS = 5;
 const MAX_ATTEMPTS = 3;
 const CHARGE_CYCLE_MS = 2500; // power ping-pongs 0→100→0 in 2.5s
-const SWEET_SPOT_HALF = 15;   // ±15 units of tolerance
+// Sweet-spot size varies by distance: close=easy (±22), far=hard (±10)
+const sweetSpotHalfForDistance = (d: number) => Math.round(8 + (1 - d) * 24);
 const TOUCH_GUARD_MS = 400;
 
 // Pick 5 unique Pokémon for the 5 rounds at game start
@@ -53,6 +54,7 @@ const TossGame = () => {
 
   const current = lineup[round] ?? null;
   const sweetSpot = current ? current.distance * 70 + 10 : 50; // 38–73 depending on distance
+  const sweetSpotHalf = current ? sweetSpotHalfForDistance(current.distance) : 15;
 
   const startGame = useCallback(() => {
     const l = pickLineup();
@@ -98,7 +100,7 @@ const TossGame = () => {
   const throwBall = () => {
     if (phase !== 'aiming') return; // guard against double-throws
     const p = powerRef.current; // use ref for latest value, not stale state
-    const isHit = Math.abs(p - sweetSpot) <= SWEET_SPOT_HALF;
+    const isHit = Math.abs(p - sweetSpot) <= sweetSpotHalf;
     const result = isHit ? 'hit' : p < sweetSpot ? 'short' : 'far';
     setThrowResult(result);
     setPhase('throwing');
@@ -276,8 +278,8 @@ const TossGame = () => {
                 <div
                   className="absolute w-full bg-green-400/50 border-y-3 border-green-400"
                   style={{
-                    height: `${SWEET_SPOT_HALF * 2}%`,
-                    bottom: `${sweetSpot - SWEET_SPOT_HALF}%`,
+                    height: `${sweetSpotHalf * 2}%`,
+                    bottom: `${sweetSpot - sweetSpotHalf}%`,
                   }}
                 >
                   <span className="absolute -left-8 top-1/2 -translate-y-1/2 font-pixel text-[9px] text-green-300">SIGT</span>
@@ -307,7 +309,7 @@ const TossGame = () => {
                 <circle
                   cx="80" cy="80" r="74"
                   fill="none"
-                  stroke={power > 0 ? (Math.abs(power - sweetSpot) <= SWEET_SPOT_HALF ? '#4ade80' : '#ef4444') : 'transparent'}
+                  stroke={power > 0 ? (Math.abs(power - sweetSpot) <= sweetSpotHalf ? '#4ade80' : '#ef4444') : 'transparent'}
                   strokeWidth="8"
                   strokeLinecap="round"
                   strokeDasharray={`${(power / 100) * 465} 465`}

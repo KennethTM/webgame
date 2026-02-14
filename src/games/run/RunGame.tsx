@@ -8,8 +8,8 @@ import { useGameActive } from '../../hooks/useGameActive';
 const TOUCH_GUARD_MS = 400;
 
 // --- constants ---
-const GRAVITY = 0.8;
-const JUMP_STRENGTH = -13;
+const GRAVITY = 0.55;
+const JUMP_STRENGTH = -14;
 const GROUND_Y = 0;
 const PIKACHU_X = 60;
 const PIKACHU_W = 44;
@@ -17,19 +17,19 @@ const PIKACHU_H = 44;
 const PLAY_W = 400;
 const PLAY_H = 280;
 const GROUND_H = 48;
-const INITIAL_SPEED = 2.5;
-const MAX_SPEED = 7;
-const SPEED_RAMP = 0.0004;
+const INITIAL_SPEED = 2.2;
+const MAX_SPEED = 5;
+const SPEED_RAMP = 0.0002;
 
-interface Obstacle { x: number; type: 'geodude' | 'diglett'; }
-interface Berry { x: number; y: number; }
+interface Obstacle { x: number; type: 'geodude' | 'diglett'; scale: number; }
+interface Pokeball { x: number; y: number; }
 interface Cloud { x: number; y: number; w: number; speed: number; }
 
 // Snapshot of all visual state — set once per frame
 interface Frame {
   pikachuY: number;
   obstacles: Obstacle[];
-  berries: Berry[];
+  pokeballs: Pokeball[];
   clouds: Cloud[];
 }
 
@@ -43,7 +43,7 @@ const INITIAL_CLOUDS: Cloud[] = [
 const INITIAL_FRAME: Frame = {
   pikachuY: 0,
   obstacles: [],
-  berries: [],
+  pokeballs: [],
   clouds: INITIAL_CLOUDS.map(c => ({ ...c })),
 };
 
@@ -63,7 +63,7 @@ const RunGame = () => {
     pikachuY: GROUND_Y,
     velocity: 0,
     obstacles: [] as (Obstacle & { scored: boolean })[],
-    berries: [] as (Berry & { collected: boolean })[],
+    pokeballs: [] as (Pokeball & { collected: boolean })[],
     clouds: INITIAL_CLOUDS.map(c => ({ ...c })),
     spawnAcc: 0,
     score: 0,
@@ -77,7 +77,7 @@ const RunGame = () => {
     e.pikachuY = GROUND_Y;
     e.velocity = 0;
     e.obstacles = [];
-    e.berries = [];
+    e.pokeballs = [];
     e.clouds = INITIAL_CLOUDS.map(c => ({ ...c }));
     e.spawnAcc = 0;
     e.score = 0;
@@ -124,9 +124,9 @@ const RunGame = () => {
       for (const obs of e.obstacles) obs.x -= e.speed;
       e.obstacles = e.obstacles.filter(o => o.x > -60);
 
-      // --- Scroll berries ---
-      for (const b of e.berries) { if (!b.collected) b.x -= e.speed; }
-      e.berries = e.berries.filter(b => b.x > -30 && !b.collected);
+      // --- Scroll pokéballs ---
+      for (const b of e.pokeballs) { if (!b.collected) b.x -= e.speed; }
+      e.pokeballs = e.pokeballs.filter(b => b.x > -30 && !b.collected);
 
       // --- Scroll clouds ---
       for (const c of e.clouds) {
@@ -136,16 +136,18 @@ const RunGame = () => {
 
       // --- Spawn ---
       e.spawnAcc += e.speed;
-      if (e.spawnAcc > 160) {
+      if (e.spawnAcc > 220) {
         e.spawnAcc = 0;
         if (Math.random() < 0.65) {
+          const scale = 0.7 + Math.random() * 0.6; // 0.7–1.3
           e.obstacles.push({
             x: PLAY_W + 10,
             type: Math.random() < 0.5 ? 'geodude' : 'diglett',
+            scale,
             scored: false,
           });
         } else {
-          e.berries.push({
+          e.pokeballs.push({
             x: PLAY_W + 10,
             y: Math.random() < 0.5 ? 0 : 50,
             collected: false,
@@ -156,9 +158,10 @@ const RunGame = () => {
       // --- Collision ---
       const py = e.pikachuY;
       for (const obs of e.obstacles) {
-        const obsW = obs.type === 'geodude' ? 38 : 30;
-        const obsH = obs.type === 'geodude' ? 38 : 30;
-        const shrink = 0.15;
+        const baseSize = obs.type === 'geodude' ? 38 : 30;
+        const obsW = Math.round(baseSize * obs.scale);
+        const obsH = Math.round(baseSize * obs.scale);
+        const shrink = 0.25;
         if (
           PIKACHU_X + PIKACHU_W * (1 - shrink) > obs.x + obsW * shrink &&
           PIKACHU_X + PIKACHU_W * shrink < obs.x + obsW * (1 - shrink) &&
@@ -170,13 +173,13 @@ const RunGame = () => {
         }
       }
 
-      // --- Berry collection ---
-      for (const b of e.berries) {
+      // --- Pokéball collection ---
+      for (const b of e.pokeballs) {
         if (b.collected) continue;
         if (
           PIKACHU_X + PIKACHU_W > b.x &&
-          PIKACHU_X < b.x + 16 &&
-          py < b.y + 36 &&
+          PIKACHU_X < b.x + 24 &&
+          py < b.y + 44 &&
           py + PIKACHU_H > b.y
         ) {
           b.collected = true;
@@ -191,8 +194,8 @@ const RunGame = () => {
       // --- Push render snapshot ---
       setFrame({
         pikachuY: e.pikachuY,
-        obstacles: e.obstacles.map(o => ({ x: o.x, type: o.type })),
-        berries: e.berries.filter(b => !b.collected).map(b => ({ x: b.x, y: b.y })),
+        obstacles: e.obstacles.map(o => ({ x: o.x, type: o.type, scale: o.scale })),
+        pokeballs: e.pokeballs.filter(b => !b.collected).map(b => ({ x: b.x, y: b.y })),
         clouds: e.clouds.map(c => ({ ...c })),
       });
     }, 1000 / 60);
@@ -261,31 +264,36 @@ const RunGame = () => {
         </div>
 
         {/* Obstacles */}
-        {frame.obstacles.map((obs, i) => (
+        {frame.obstacles.map((obs, i) => {
+          const baseSize = obs.type === 'geodude' ? 38 : 30;
+          const size = Math.round(baseSize * obs.scale);
+          return (
+            <div
+              key={`obs-${i}`}
+              className="absolute z-[5]"
+              style={{
+                left: obs.x, bottom: GROUND_H,
+                width: size, height: size,
+              }}
+            >
+              <SpriteImage pokemonId={obs.type === 'geodude' ? 74 : 50} variant="sprite" size={size} />
+            </div>
+          );
+        })}
+
+        {/* Pokéballs */}
+        {frame.pokeballs.map((b, i) => (
           <div
-            key={`obs-${i}`}
+            key={`ball-${i}`}
             className="absolute z-[5]"
-            style={{
-              left: obs.x, bottom: GROUND_H,
-              width: obs.type === 'geodude' ? 38 : 30,
-              height: obs.type === 'geodude' ? 38 : 30,
-            }}
+            style={{ left: b.x, bottom: GROUND_H + b.y + 10 }}
           >
-            <SpriteImage pokemonId={obs.type === 'geodude' ? 74 : 50} variant="sprite" size={obs.type === 'geodude' ? 38 : 30} />
+            <PokeBall size={22} />
           </div>
         ))}
 
-        {/* Berries */}
-        {frame.berries.map((b, i) => (
-          <div
-            key={`berry-${i}`}
-            className="absolute z-[5] w-4 h-4 bg-gradient-to-br from-pink-400 to-red-500 rounded-full border-2 border-red-300 shadow-[0_0_8px_rgba(239,68,68,0.7)]"
-            style={{ left: b.x, bottom: GROUND_H + b.y + 10 }}
-          />
-        ))}
-
         {gameState === 'idle' && (
-          <GameOverlay variant="idle" title="PokéRun" subtitle="Hop over forhindringer!" pokemonId={25} onAction={startGame} />
+          <GameOverlay variant="idle" title="PokéRun" subtitle="Saml PokéBalls og undgå Pokémon!" pokemonId={25} onAction={startGame} />
         )}
         {gameState === 'game-over' && (
           <GameOverlay variant="game-over" title="Pikachu besvimede!" pokemonId={25} score={score} stars={stars} onAction={startGame} />
