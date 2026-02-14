@@ -145,12 +145,12 @@ const MemoryGame = () => {
       <div className="flex flex-col items-center select-none">
         <SpriteImage pokemonId={39} size={80} />
         <h2 className="font-pixel text-lg text-white mt-3 mb-1">Pokémon Match</h2>
-        <p className="text-white/70 text-sm mb-5">Choose difficulty</p>
+        <p className="text-white/70 text-sm mb-5">Vælg sværhedsgrad</p>
         <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
           {([
-            { key: 'easy' as Difficulty,   label: 'Easy',   sub: '3 × 4', color: 'from-green-500 to-green-600' },
-            { key: 'medium' as Difficulty, label: 'Medium', sub: '4 × 5', color: 'from-blue-500 to-blue-600' },
-            { key: 'hard' as Difficulty,   label: 'Hard',   sub: '5 × 6', color: 'from-orange-500 to-orange-600' },
+            { key: 'easy' as Difficulty,   label: 'Let',    sub: '3 × 4', color: 'from-green-500 to-green-600' },
+            { key: 'medium' as Difficulty, label: 'Middel', sub: '4 × 5', color: 'from-blue-500 to-blue-600' },
+            { key: 'hard' as Difficulty,   label: 'Svær',   sub: '5 × 6', color: 'from-orange-500 to-orange-600' },
             { key: 'ultra' as Difficulty,  label: 'Ultra',  sub: '6 × 7', color: 'from-red-500 to-red-600' },
           ]).map(d => (
             <button
@@ -164,7 +164,7 @@ const MemoryGame = () => {
           ))}
         </div>
         {best.bestScore > 0 && (
-          <div className="mt-4 text-white/40 font-pixel text-xs">Best: {best.bestScore} moves</div>
+          <div className="mt-4 text-white/40 font-pixel text-xs">Bedst: {best.bestScore} træk</div>
         )}
       </div>
     );
@@ -190,12 +190,12 @@ const MemoryGame = () => {
           onClick={backToMenu}
           className="bg-white/10 px-3 py-1.5 rounded-full text-white/70 text-xs font-bold hover:bg-white/20 transition-colors"
         >
-          ← Difficulty
+          ← Sværhedsgrad
         </button>
         <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full flex items-center gap-2">
-          <span className="text-blue-200 text-sm font-bold">Moves</span>
+          <span className="text-blue-200 text-sm font-bold">Træk</span>
           <span className="text-white font-pixel text-sm">{moves}</span>
-          {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Best: {best.bestScore}</span>}
+          {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Bedst: {best.bestScore}</span>}
         </div>
         {/* Pokeball progress */}
         <div className="flex gap-0.5 flex-wrap max-w-[120px]">
@@ -254,8 +254,8 @@ const MemoryGame = () => {
       {isWon && (
         <GameOverlay
           variant="victory"
-          title="You Found Them All!"
-          subtitle={`Completed in ${moves} moves`}
+          title="Du fandt dem alle!"
+          subtitle={`Klaret på ${moves} træk`}
           pokemonId={25}
           stars={stars}
           onAction={initGame}

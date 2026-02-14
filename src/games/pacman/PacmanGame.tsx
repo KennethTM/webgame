@@ -226,7 +226,7 @@ const PacmanGame = () => {
       <div className="mb-3 flex items-center gap-2 bg-black/30 px-4 py-1.5 rounded-full">
         <SpriteImage pokemonId={92} variant="sprite" size={24} />
         <span className="font-pixel text-sm text-white">{score}</span>
-        {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Best: {best.bestScore}</span>}
+        {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Bedst: {best.bestScore}</span>}
       </div>
 
       {/* Maze */}
@@ -289,7 +289,7 @@ const PacmanGame = () => {
         {gameOver && (
           <GameOverlay
             variant="game-over"
-            title="A wild Gastly appeared!"
+            title="En vild Gastly dukkede op!"
             pokemonId={92}
             score={score}
             stars={stars}
@@ -301,7 +301,7 @@ const PacmanGame = () => {
         {isWon && (
           <GameOverlay
             variant="victory"
-            title="The cave is clear!"
+            title="Hulen er ryddet!"
             pokemonId={94}
             score={score}
             stars={stars}

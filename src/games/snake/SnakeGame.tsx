@@ -143,7 +143,7 @@ const SnakeGame = () => {
       <div className="mb-3 flex items-center gap-2 bg-black/30 px-4 py-1.5 rounded-full">
         <SpriteImage pokemonId={23} variant="sprite" size={24} />
         <span className="font-pixel text-sm text-white">{score}</span>
-        {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Best: {best.bestScore}</span>}
+        {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Bedst: {best.bestScore}</span>}
       </div>
 
       {/* Board */}
@@ -224,7 +224,7 @@ const SnakeGame = () => {
           <GameOverlay
             variant="idle"
             title="PokéSnake"
-            subtitle="Help Ekans eat berries!"
+            subtitle="Hjælp Ekans med at spise bær!"
             pokemonId={23}
             onAction={startGame}
           />
@@ -234,7 +234,7 @@ const SnakeGame = () => {
         {gameOver && (
           <GameOverlay
             variant="game-over"
-            title="Ekans fainted!"
+            title="Ekans besvimede!"
             pokemonId={23}
             score={score}
             stars={stars}

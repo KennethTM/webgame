@@ -39,7 +39,7 @@ const GameShell = () => {
   const id = location.pathname.split('/').pop();
   const game = games.find((g) => g.id === id);
 
-  if (!game) return <div className="text-white p-8">Game not found</div>;
+  if (!game) return <div className="text-white p-8">Spil ikke fundet</div>;
 
   return (
     <div className="flex flex-col h-screen">
@@ -58,7 +58,7 @@ const GameShell = () => {
             }`}
         >
           <PokeBall size={20} />
-          {confirmLeave ? 'Tap to leave' : 'Back'}
+          {confirmLeave ? 'Tryk for at forlade' : 'Tilbage'}
         </button>
         <h1 className="font-pixel text-xs sm:text-sm relative z-10">{game.title}</h1>
         <SpriteImage pokemonId={game.pokemonId} variant="sprite" size={36} className="relative z-10" />

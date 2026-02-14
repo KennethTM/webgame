@@ -175,7 +175,7 @@ const TossGame = () => {
         <GameOverlay
           variant="idle"
           title="PokéBall Toss"
-          subtitle="Catch wild Pokémon!"
+          subtitle="Fang vilde Pokémon!"
           pokemonId={1}
           onAction={startGame}
         />
@@ -184,8 +184,8 @@ const TossGame = () => {
       {phase === 'victory' && (
         <GameOverlay
           variant="victory"
-          title="Well Done!"
-          subtitle={`Caught ${totalCaught} of ${TOTAL_ROUNDS}`}
+          title="Godt klaret!"
+          subtitle={`Fangede ${totalCaught} af ${TOTAL_ROUNDS}`}
           pokemonId={1}
           stars={stars}
           score={totalCaught}
@@ -198,13 +198,13 @@ const TossGame = () => {
           {/* Stats */}
           <div className="mb-3 flex items-center gap-3">
             <div className="bg-black/30 px-3 py-1.5 rounded-full flex items-center gap-2">
-              <span className="text-green-200 text-xs font-bold">Round</span>
+              <span className="text-green-200 text-xs font-bold">Runde</span>
               <span className="text-white font-pixel text-xs">{round + 1}/{TOTAL_ROUNDS}</span>
             </div>
             <div className="bg-black/30 px-3 py-1.5 rounded-full flex items-center gap-2">
-              <span className="text-green-200 text-xs font-bold">Caught</span>
+              <span className="text-green-200 text-xs font-bold">Fanget</span>
               <span className="text-pokemon-yellow font-pixel text-xs">{totalCaught}</span>
-              {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Best: {best.bestScore}</span>}
+              {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Bedst: {best.bestScore}</span>}
             </div>
             {/* Attempt pips */}
             <div className="flex gap-1">
@@ -255,7 +255,7 @@ const TossGame = () => {
             {phase === 'caught' && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="font-pixel text-xl text-pokemon-yellow animate-pop drop-shadow-lg">
-                  Gotcha!
+                  Fanget!
                 </div>
               </div>
             )}
@@ -264,7 +264,7 @@ const TossGame = () => {
             {phase === 'missed' && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="font-pixel text-lg text-red-400 animate-shake drop-shadow-lg">
-                  {throwResult === 'short' ? 'Too short!' : 'Too far!'}
+                  {throwResult === 'short' ? 'For kort!' : 'For langt!'}
                 </div>
               </div>
             )}
@@ -280,7 +280,7 @@ const TossGame = () => {
                     bottom: `${sweetSpot - SWEET_SPOT_HALF}%`,
                   }}
                 >
-                  <span className="absolute -left-8 top-1/2 -translate-y-1/2 font-pixel text-[9px] text-green-300">AIM</span>
+                  <span className="absolute -left-8 top-1/2 -translate-y-1/2 font-pixel text-[9px] text-green-300">SIGT</span>
                 </div>
                 {/* Power fill — absolute positioned, no flex, no CSS transition */}
                 <div
@@ -318,7 +318,7 @@ const TossGame = () => {
                 <div className="flex flex-col items-center gap-1">
                   <PokeBall size={44} />
                   <span className="font-pixel text-[11px] text-gray-600">
-                    {power > 0 ? `${Math.round(power)}%` : 'HOLD'}
+                    {power > 0 ? `${Math.round(power)}%` : 'TRYK'}
                   </span>
                 </div>
               </div>

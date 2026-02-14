@@ -95,7 +95,7 @@ const QuizGame = () => {
         <GameOverlay
           variant="idle"
           title="Who's That Pokémon?"
-          subtitle="Guess the silhouette!"
+          subtitle="Gæt silhuetten!"
           pokemonId={25}
           onAction={startGame}
         />
@@ -106,13 +106,13 @@ const QuizGame = () => {
           {/* Stats bar */}
           <div className="mb-4 flex items-center gap-4">
             <div className="bg-black/30 px-4 py-1.5 rounded-full flex items-center gap-2">
-              <span className="text-blue-200 text-sm font-bold">Round</span>
+              <span className="text-blue-200 text-sm font-bold">Runde</span>
               <span className="text-white font-pixel text-sm">{round + 1}/{TOTAL_ROUNDS}</span>
             </div>
             <div className="bg-black/30 px-4 py-1.5 rounded-full flex items-center gap-2">
-              <span className="text-blue-200 text-sm font-bold">Score</span>
+              <span className="text-blue-200 text-sm font-bold">Point</span>
               <span className="text-pokemon-yellow font-pixel text-sm">{score}</span>
-              {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Best: {best.bestScore}</span>}
+              {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Bedst: {best.bestScore}</span>}
             </div>
           </div>
 
@@ -176,8 +176,8 @@ const QuizGame = () => {
       {gameState === 'victory' && (
         <GameOverlay
           variant="victory"
-          title="Pokémon Master!"
-          subtitle={`${score} out of ${TOTAL_ROUNDS} correct`}
+          title="Pokémon-mester!"
+          subtitle={`${score} ud af ${TOTAL_ROUNDS} rigtige`}
           pokemonId={25}
           stars={stars}
           score={score}

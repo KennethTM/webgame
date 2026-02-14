@@ -215,7 +215,7 @@ const RunGame = () => {
         <div className="mb-3 flex items-center gap-2 bg-black/30 px-4 py-1.5 rounded-full">
           <SpriteImage pokemonId={25} variant="sprite" size={24} />
           <span className="font-pixel text-sm text-white">{score}</span>
-          {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Best: {best.bestScore}</span>}
+          {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Bedst: {best.bestScore}</span>}
         </div>
       )}
 
@@ -285,10 +285,10 @@ const RunGame = () => {
         ))}
 
         {gameState === 'idle' && (
-          <GameOverlay variant="idle" title="PokéRun" subtitle="Jump over obstacles!" pokemonId={25} onAction={startGame} />
+          <GameOverlay variant="idle" title="PokéRun" subtitle="Hop over forhindringer!" pokemonId={25} onAction={startGame} />
         )}
         {gameState === 'game-over' && (
-          <GameOverlay variant="game-over" title="Pikachu fainted!" pokemonId={25} score={score} stars={stars} onAction={startGame} />
+          <GameOverlay variant="game-over" title="Pikachu besvimede!" pokemonId={25} score={score} stars={stars} onAction={startGame} />
         )}
       </div>
 
@@ -301,7 +301,7 @@ const RunGame = () => {
         >
           <div className="flex flex-col items-center gap-1">
             <PokeBall size={36} />
-            <span className="font-pixel text-[11px] text-gray-800">JUMP</span>
+            <span className="font-pixel text-[11px] text-gray-800">HOP</span>
           </div>
         </button>
       )}

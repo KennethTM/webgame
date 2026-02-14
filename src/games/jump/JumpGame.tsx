@@ -81,7 +81,7 @@ const JumpGame = () => {
       <div className="mb-3 flex items-center gap-2 bg-black/30 backdrop-blur-sm px-4 py-1.5 rounded-full">
         <SpriteImage pokemonId={129} variant="sprite" size={24} />
         {height > 0 && <span className="font-pixel text-sm text-white">{height}m</span>}
-        {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Best: {best.bestScore}m</span>}
+        {best.bestScore > 0 && <span className="font-pixel text-xs text-white/40 ml-1">Bedst: {best.bestScore}m</span>}
       </div>
 
       {/* Play area */}
@@ -150,7 +150,7 @@ const JumpGame = () => {
           <GameOverlay
             variant="idle"
             title="Magikarp Jump"
-            subtitle="Tap to power up!"
+            subtitle="Tryk for at lade op!"
             pokemonId={129}
             onAction={startCharging}
           />
@@ -159,7 +159,7 @@ const JumpGame = () => {
         {/* Charging UI */}
         {gameState === 'charging' && (
           <div className="absolute top-6 w-full px-6 z-30 flex flex-col items-center">
-            <div className="font-pixel text-lg text-pokemon-red mb-2">TAP TAP TAP!</div>
+            <div className="font-pixel text-lg text-pokemon-red mb-2">TRYK TRYK TRYK!</div>
             <div className="w-full bg-gray-200 h-6 rounded-full border-3 border-white shadow-md overflow-hidden">
               <div
                 className="h-full bg-pokemon-red transition-all duration-100 rounded-full"
@@ -173,7 +173,7 @@ const JumpGame = () => {
         {/* Jumping text */}
         {gameState === 'jumping' && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-            <div className="font-pixel text-2xl text-pokemon-blue animate-pulse drop-shadow-lg">JUMP!!!</div>
+            <div className="font-pixel text-2xl text-pokemon-blue animate-pulse drop-shadow-lg">HOP!!!</div>
           </div>
         )}
 
@@ -182,7 +182,7 @@ const JumpGame = () => {
           <GameOverlay
             variant="victory"
             title={`${height}m!`}
-            subtitle={height > 40 ? 'Magikarp evolved!' : 'Not bad for a fish!'}
+            subtitle={height > 40 ? 'Magikarp udviklede sig!' : 'Ikke dårligt for en fisk!'}
             pokemonId={showGyarados ? 130 : 129}
             stars={stars}
             onAction={reset}
@@ -200,7 +200,7 @@ const JumpGame = () => {
         >
           <div className="flex flex-col items-center">
             <PokeBall size={40} />
-            <span className="font-pixel text-xs text-gray-800 mt-2">JUMP</span>
+            <span className="font-pixel text-xs text-gray-800 mt-2">HOP</span>
           </div>
         </button>
       )}

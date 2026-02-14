@@ -12,7 +12,7 @@ export const games: GameMetadata[] = [
   {
     id: 'snake',
     title: 'PokéSnake',
-    description: 'Help Ekans eat berries and grow!',
+    description: 'Hjælp Ekans med at spise bær og vokse!',
     pokemonId: 23,        // Ekans
     path: '/game/snake',
     gradient: 'from-purple-600 to-purple-900',
@@ -21,7 +21,7 @@ export const games: GameMetadata[] = [
   {
     id: 'pacman',
     title: 'PokéBall Maze',
-    description: 'Collect Rare Candies and avoid Gastly!',
+    description: 'Saml Rare Candies og undgå Gastly!',
     pokemonId: 92,        // Gastly
     path: '/game/pacman',
     gradient: 'from-amber-500 to-orange-700',
@@ -30,7 +30,7 @@ export const games: GameMetadata[] = [
   {
     id: 'memory',
     title: 'Pokémon Match',
-    description: 'Find all the Pokémon pairs!',
+    description: 'Find alle Pokémon-parrene!',
     pokemonId: 39,        // Jigglypuff
     path: '/game/memory',
     gradient: 'from-blue-500 to-blue-800',
@@ -39,7 +39,7 @@ export const games: GameMetadata[] = [
   {
     id: 'jump',
     title: 'Magikarp Jump',
-    description: 'How high can your Magikarp jump?',
+    description: 'Hvor højt kan din Magikarp hoppe?',
     pokemonId: 129,       // Magikarp
     path: '/game/jump',
     gradient: 'from-red-500 to-red-800',
@@ -48,7 +48,7 @@ export const games: GameMetadata[] = [
   {
     id: 'quiz',
     title: "Who's That Pokémon?",
-    description: 'Guess the Pokémon from its silhouette!',
+    description: 'Gæt Pokémon ud fra silhuetten!',
     pokemonId: 54,        // Psyduck
     path: '/game/quiz',
     gradient: 'from-yellow-400 to-amber-600',
@@ -57,7 +57,7 @@ export const games: GameMetadata[] = [
   {
     id: 'toss',
     title: 'PokéBall Toss',
-    description: 'Catch wild Pokémon with perfect throws!',
+    description: 'Fang vilde Pokémon med perfekte kast!',
     pokemonId: 1,         // Bulbasaur
     path: '/game/toss',
     gradient: 'from-green-500 to-emerald-700',
@@ -66,7 +66,7 @@ export const games: GameMetadata[] = [
   {
     id: 'run',
     title: 'PokéRun',
-    description: 'Jump over obstacles and collect berries!',
+    description: 'Hop over forhindringer og saml bær!',
     pokemonId: 25,        // Pikachu
     path: '/game/run',
     gradient: 'from-yellow-400 to-amber-600',

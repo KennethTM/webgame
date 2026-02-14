@@ -45,8 +45,8 @@ const Home = () => {
             </h1>
             <SpriteImage pokemonId={133} variant="artwork" size={72} className="drop-shadow-[0_0_12px_rgba(183,130,87,0.4)]" />
           </div>
-          <p className="text-lg text-blue-200 mb-1">Choose a game to start your adventure!</p>
-          <p className="font-pixel text-[10px] text-pokemon-yellow/50 tracking-wider mb-4">KANTO REGION</p>
+          <p className="text-lg text-blue-200 mb-1">Vælg et spil og begynd dit eventyr!</p>
+          <p className="font-pixel text-[10px] text-pokemon-yellow/50 tracking-wider mb-4">KANTO-REGIONEN</p>
 
           {/* Star progress */}
           <div className="inline-flex items-center gap-3 bg-black/30 backdrop-blur-sm px-5 py-2 rounded-full">
@@ -110,7 +110,7 @@ const Home = () => {
             <PokeBall size={14} />
             <div className="h-px w-12 bg-gradient-to-l from-transparent to-pokemon-red/30" />
           </div>
-          <p className="font-pixel text-xs text-pokemon-yellow/40">Gotta Play &apos;Em All!</p>
+          <p className="font-pixel text-xs text-pokemon-yellow/40">Spil Dem Alle!</p>
         </footer>
       </div>
     </div>

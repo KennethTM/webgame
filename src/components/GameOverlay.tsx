@@ -20,12 +20,12 @@ const Star = ({ filled }: { filled: boolean }) => (
 );
 
 const ENCOURAGEMENTS = [
-  'A good trainer never gives up!',
-  'Every Pokémon Master started here!',
-  'Try again, trainer!',
-  'You can do it!',
-  'Professor Oak believes in you!',
-  'Keep training!',
+  'En god træner giver aldrig op!',
+  'Enhver Pokémon-mester startede her!',
+  'Prøv igen, træner!',
+  'Du kan godt!',
+  'Professor Oak tror på dig!',
+  'Bliv ved med at træne!',
 ];
 
 const GameOverlay = ({
@@ -124,7 +124,7 @@ const GameOverlay = ({
           }`}
       >
         <PokeBall size={22} />
-        {actionLabel ?? (isIdle ? 'Start!' : 'Play Again')}
+        {actionLabel ?? (isIdle ? 'Start!' : 'Spil igen')}
       </button>
     </div>
   );
