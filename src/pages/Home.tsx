@@ -3,10 +3,12 @@ import { games } from '../gameRegistry';
 import SpriteImage from '../components/SpriteImage';
 import PokeBall from '../components/PokeBall';
 import { getScores } from '../lib/highScores';
+import { useNavigate } from 'react-router-dom';
 
 const MAX_STARS = games.length * 3;
 
 const Home = () => {
+  const navigate = useNavigate();
   const scores = getScores();
   const totalStars = games.reduce((sum, g) => sum + (scores[g.id]?.bestStars ?? 0), 0);
 
@@ -30,6 +32,14 @@ const Home = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8 relative z-10">
+        {/* Back to landing */}
+        <button
+          onClick={() => navigate('/')}
+          className="mb-4 flex items-center gap-2 text-white/60 hover:text-white/90 text-sm transition-colors"
+        >
+          ← Forside
+        </button>
+
         {/* Header */}
         <header className="text-center mb-10">
           {/* Pokéball accent line */}

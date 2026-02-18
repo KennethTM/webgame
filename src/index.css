@@ -100,3 +100,11 @@ body {
 
 /* ===== Touch ===== */
 .touch-manipulation { touch-action: manipulation; }
+
+/* ===== Maskiner games ===== */
+@keyframes pop-collect {
+  0%   { transform: scale(1);   opacity: 1; }
+  60%  { transform: scale(1.6); opacity: 0.8; }
+  100% { transform: scale(0.2); opacity: 0; }
+}
+.animate-pop-collect { animation: pop-collect 0.35s ease-out forwards; }

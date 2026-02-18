@@ -21,14 +21,14 @@ const GameShell = () => {
 
   const handleBack = useCallback(() => {
     if (!isGameActive) {
-      navigate('/');
+      navigate('/pokemon');
       return;
     }
     if (confirmLeave) {
       // Second tap — actually leave
       if (confirmTimer.current) clearTimeout(confirmTimer.current);
       setConfirmLeave(false);
-      navigate('/');
+      navigate('/pokemon');
     } else {
       // First tap — show warning, reset after 2s
       setConfirmLeave(true);

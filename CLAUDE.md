@@ -4,7 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Pokémon Web Arcade — a collection of Pokémon-themed web games for young kids (age 6). Built with React 19, TypeScript, Tailwind CSS 4, and Vite 7. Static site using HashRouter for GitHub Pages compatibility.
+Kids Web Arcade — a collection of themed web games for young children. Built with React 19, TypeScript, Tailwind CSS 4, and Vite 7. Static site using HashRouter for GitHub Pages compatibility.
+
+- **Pokémon section** (`/pokemon`): 7 Pokémon-themed games for age 6+
+- **Maskiner section** (`/maskiner`): Machine/vehicle-themed games for age 3+
 
 ## Commands
 
@@ -19,9 +22,25 @@ No test framework is configured.
 
 ## Architecture
 
-**Routing**: `App.tsx` uses HashRouter. Games are nested under `/game` with `GameShell` as the layout wrapper (provides header + back button). Home page is at `/`.
+**Routing**: `App.tsx` uses HashRouter with the following structure:
 
-**Game Registry Pattern**: `src/gameRegistry.ts` is the central config. Each game has an entry with id, title, description, icon, path, and color. The Home page renders game cards by mapping over this registry. To add a new game:
+```
+/             → Landing.tsx         (section selector: Pokémon vs Maskiner)
+/pokemon      → pages/Home.tsx      (Pokémon game selection)
+/maskiner     → pages/MachinesHome.tsx  (Machines game selection)
+/game         → GameShell layout wrapper (Pokémon games)
+  /game/snake
+  /game/pacman
+  /game/memory
+  /game/jump
+  /game/quiz
+  /game/toss
+  /game/run
+```
+
+**GameShell**: Layout wrapper for Pokémon games. Provides header with back button (navigates to `/pokemon`). The back button has a two-tap confirmation guard when a game is active (`isGameActive` context).
+
+**Game Registry Pattern**: `src/gameRegistry.ts` is the central config for Pokémon games. Each entry has id, title, description, pokemonId, path, gradient, and bgVariant. The Home page maps over this registry to render game cards. To add a new Pokémon game:
 1. Create `src/games/<name>/<Name>Game.tsx`
 2. Add metadata to `gameRegistry.ts`
 3. Add a `<Route>` in `App.tsx` under the `/game` parent route
@@ -31,3 +50,5 @@ No test framework is configured.
 **Styling**: Tailwind CSS utility classes exclusively. Custom Pokémon theme colors defined as CSS custom properties in `src/index.css` (`--color-pokemon-yellow`, `--color-pokemon-blue`, `--color-pokemon-red`, `--color-pokemon-gold`). Dynamic positioning uses inline styles.
 
 **Input**: All games support both keyboard (arrow keys) and touch/mouse for tablet use. Touch targets are deliberately large.
+
+**Language**: All UI text is in Danish.
