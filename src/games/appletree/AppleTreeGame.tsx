@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { vibrateSuccess, vibrateVictory, vibrateError } from '../../hooks/useVibrate';
 
 type GameState = 'idle' | 'playing' | 'won' | 'lost';
@@ -46,13 +46,18 @@ const APPLE_POSITIONS = [
 
 // Confetti
 const CONFETTI_COLORS = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#f97316'];
-const CONFETTI_PIECES = Array.from({ length: 24 }, (_, i) => ({
-  key: i,
-  color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-  left: `${Math.random() * 100}%`,
-  delay: `${Math.random() * 1.5}s`,
-  size: `${10 + Math.random() * 10}px`,
-}));
+
+type ConfettiPiece = { key: number; color: string; left: string; delay: string; size: string };
+
+function makeConfetti(): ConfettiPiece[] {
+  return Array.from({ length: 24 }, (_, i) => ({
+    key: i,
+    color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+    left: `${Math.random() * 100}%`,
+    delay: `${Math.random() * 1.5}s`,
+    size: `${10 + Math.random() * 10}px`,
+  }));
+}
 
 const AppleTreeGame = () => {
   const [gameState, setGameState] = useState<GameState>('idle');
@@ -67,7 +72,7 @@ const AppleTreeGame = () => {
     nextFromRight: true,
   });
 
-  const confettiPieces = useMemo(() => CONFETTI_PIECES, []);
+  const [confettiPieces] = useState<ConfettiPiece[]>(makeConfetti);
 
   const startGame = useCallback(() => {
     const initialApples: Apple[] = Array.from({ length: TOTAL_APPLES }, (_, i) => ({

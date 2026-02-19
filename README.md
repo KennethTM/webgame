@@ -1,6 +1,6 @@
-# Pokémon Web Arcade
+# Kids Web Arcade
 
-A collection of Pokémon-themed web games for kids. Built with React 19, TypeScript, Tailwind CSS 4, and Vite 7.
+A collection of themed web games for young children. Built with React 19, TypeScript, Tailwind CSS 4, and Vite 7.
 
 **Play now:** [https://kennethtm.github.io/webgame/](https://kennethtm.github.io/webgame/)
 
@@ -22,6 +22,8 @@ One-time setup: go to repo **Settings → Pages → Source** and select **GitHub
 
 ## Games
 
+### Pokémon (age 6+)
+
 - **PokéSnake** — Help Ekans eat berries and grow
 - **PokéBall Maze** — Pac-Man style maze with Gastly ghosts
 - **Pokémon Match** — Memory card matching
@@ -29,3 +31,12 @@ One-time setup: go to repo **Settings → Pages → Source** and select **GitHub
 - **Who's That Pokémon?** — Silhouette guessing quiz
 - **PokéBall Toss** — Catch wild Pokémon with timed throws
 - **PokéRun** — Endless runner with Pikachu
+
+### Maskiner / Vehicles (age 3+)
+
+- **Maskiner Memory** — Match pairs of vehicle emojis
+- **Traktor Høst** — Drive the tractor and harvest all crops
+- **Æbletræ** — Protect the apple tree from hungry birds
+- **Brandbil** — Tap fires to extinguish them with the fire truck
+- **Vask Bilen** — Scrub the dirt spots off cars at the car wash
+- **Gravemaskine** — Scoop treasures and fill the dump truck

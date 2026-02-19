@@ -85,6 +85,7 @@ const Home = () => {
                 transition-transform duration-200
                 hover:scale-105 active:scale-95
                 border-2 border-white/10 hover:border-pokemon-yellow/40
+                touch-manipulation
               `}
             >
               {/* Glow effect on hover */}

@@ -108,3 +108,113 @@ body {
   100% { transform: scale(0.2); opacity: 0; }
 }
 .animate-pop-collect { animation: pop-collect 0.35s ease-out forwards; }
+
+/* ===== New Maskiner game animations ===== */
+@keyframes fire-flicker {
+  0%, 100% { transform: scale(1) rotate(-2deg); filter: brightness(1); }
+  25%       { transform: scale(1.1) rotate(2deg); filter: brightness(1.15); }
+  50%       { transform: scale(0.95) rotate(-1deg); filter: brightness(0.9); }
+  75%       { transform: scale(1.08) rotate(3deg); filter: brightness(1.1); }
+}
+.animate-fire-flicker { animation: fire-flicker 0.6s ease-in-out infinite; }
+
+@keyframes water-splash {
+  0%   { transform: scale(0.3); opacity: 1; }
+  60%  { transform: scale(1.8); opacity: 0.7; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.animate-water-splash { animation: water-splash 0.5s ease-out forwards; }
+
+@keyframes bubble-rise {
+  0%   { transform: translateY(0) scale(1); opacity: 0.9; }
+  100% { transform: translateY(-80px) scale(1.3); opacity: 0; }
+}
+.animate-bubble-rise { animation: bubble-rise 0.9s ease-out forwards; }
+
+@keyframes car-arrive {
+  0%   { transform: translateX(120%); }
+  100% { transform: translateX(0); }
+}
+.animate-car-arrive { animation: car-arrive 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+@keyframes car-depart {
+  0%   { transform: translateX(0) scale(1); }
+  20%  { transform: translateX(-5%) scale(1.04); }
+  100% { transform: translateX(-130%) scale(1); }
+}
+.animate-car-depart { animation: car-depart 0.7s cubic-bezier(0.55, 0, 1, 0.45) forwards; }
+
+@keyframes arm-swing-scoop {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(45deg); }
+}
+.animate-arm-scoop { animation: arm-swing-scoop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+@keyframes arm-swing-dump {
+  0%   { transform: rotate(45deg); }
+  100% { transform: rotate(-30deg); }
+}
+.animate-arm-dump { animation: arm-swing-dump 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+@keyframes arm-return {
+  0%   { transform: rotate(-30deg); }
+  100% { transform: rotate(0deg); }
+}
+.animate-arm-return { animation: arm-return 0.35s ease-in-out forwards; }
+
+@keyframes item-drop {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(60px) scale(0.6); opacity: 0.6; }
+}
+.animate-item-drop { animation: item-drop 0.4s ease-in forwards; }
+
+@keyframes smoke-rise {
+  0%   { transform: translate(-50%, 0) scale(0.5); opacity: 0.65; }
+  60%  { transform: translate(-50%, -30px) scale(1.1); opacity: 0.35; }
+  100% { transform: translate(-50%, -55px) scale(1.4); opacity: 0; }
+}
+.animate-smoke-rise   { animation: smoke-rise 2s ease-out infinite; }
+.animate-smoke-rise-d { animation: smoke-rise 2s ease-out 0.85s infinite; }
+
+@keyframes score-pop {
+  0%   { transform: translate(-50%, 0) scale(0.8); opacity: 1; }
+  70%  { transform: translate(-50%, -40px) scale(1.2); opacity: 0.9; }
+  100% { transform: translate(-50%, -70px) scale(1); opacity: 0; }
+}
+.animate-score-pop { animation: score-pop 0.9s ease-out forwards; }
+
+/* ===== Gravemaskine enhanced animations ===== */
+@keyframes item-wobble {
+  0%, 100% { transform: translateX(-50%) rotate(0deg) scale(1); }
+  25%       { transform: translateX(-50%) rotate(-4deg) scale(1.05); }
+  75%       { transform: translateX(-50%) rotate(4deg) scale(1.05); }
+}
+.animate-item-wobble { animation: item-wobble 2s ease-in-out infinite; }
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 12px 4px rgba(251,191,36,0.3); }
+  50%       { box-shadow: 0 0 24px 10px rgba(251,191,36,0.7); }
+}
+.animate-glow-pulse { animation: glow-pulse 1.5s ease-in-out infinite; }
+
+@keyframes dirt-fly {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0.9; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.3); opacity: 0; }
+}
+.animate-dirt-fly { animation: dirt-fly 0.6s ease-out forwards; }
+
+@keyframes truck-bounce {
+  0%   { transform: scaleY(1); }
+  30%  { transform: scaleY(0.92); }
+  60%  { transform: scaleY(1.05); }
+  100% { transform: scaleY(1); }
+}
+.animate-truck-bounce { animation: truck-bounce 0.4s ease-out; }
+
+@keyframes label-pop {
+  0%   { transform: translate(-50%, 0) scale(0.5); opacity: 0; }
+  20%  { transform: translate(-50%, -20px) scale(1.3); opacity: 1; }
+  70%  { transform: translate(-50%, -50px) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%, -70px) scale(1); opacity: 0; }
+}
+.animate-label-pop { animation: label-pop 1s ease-out forwards; }

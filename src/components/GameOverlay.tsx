@@ -114,16 +114,17 @@ const GameOverlay = ({
       {/* Action button */}
       <button
         onClick={onAction}
-        className={`flex items-center gap-2 font-bold text-base px-6 py-2.5 rounded-full shadow-xl
-          transition-transform active:scale-95 hover:scale-105
+        className={`flex items-center gap-3 font-bold text-xl px-10 py-4 rounded-2xl shadow-xl
+          transition-transform active:scale-95 hover:scale-105 touch-manipulation
           ${isIdle
             ? 'bg-pokemon-red text-white'
             : isVictory
               ? 'bg-pokemon-yellow text-gray-900'
               : 'bg-white text-gray-900'
           }`}
+        style={{ minHeight: '56px' }}
       >
-        <PokeBall size={22} />
+        <PokeBall size={28} />
         {actionLabel ?? (isIdle ? 'Start!' : 'Spil igen')}
       </button>
     </div>

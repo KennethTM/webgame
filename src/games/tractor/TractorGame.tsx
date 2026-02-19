@@ -1,5 +1,6 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { vibrateSuccess, vibrateVictory } from '../../hooks/useVibrate';
+import { useHighScore } from '../../hooks/useHighScore';
 
 type GameState = 'idle' | 'playing' | 'won';
 
@@ -20,13 +21,18 @@ function generateCrops(exclude: Pos): Set<string> {
 }
 
 const CONFETTI_COLORS = ['#f59e0b', '#10b981', '#fbbf24', '#ef4444', '#84cc16'];
-const CONFETTI_PIECES = Array.from({ length: 24 }, (_, i) => ({
-  key: i,
-  color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-  left: `${Math.random() * 100}%`,
-  delay: `${Math.random() * 1.2}s`,
-  size: `${10 + Math.random() * 10}px`,
-}));
+
+type ConfettiPiece = { key: number; color: string; left: string; delay: string; size: string };
+
+function makeConfetti(): ConfettiPiece[] {
+  return Array.from({ length: 24 }, (_, i) => ({
+    key: i,
+    color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+    left: `${Math.random() * 100}%`,
+    delay: `${Math.random() * 1.2}s`,
+    size: `${10 + Math.random() * 10}px`,
+  }));
+}
 
 interface TractorDPadProps {
   onMove: (dx: number, dy: number) => void;
@@ -36,21 +42,26 @@ const TractorDPad = ({ onMove }: TractorDPadProps) => {
   const handle = (dx: number, dy: number) => ({
     onPointerDown: (e: React.PointerEvent) => {
       e.preventDefault();
+      e.currentTarget.releasePointerCapture(e.pointerId);
+      onMove(dx, dy);
+    },
+    onTouchStart: (e: React.TouchEvent) => {
+      e.preventDefault();
       onMove(dx, dy);
     },
     onContextMenu: (e: React.MouseEvent) => e.preventDefault(),
   });
 
   const btnClass =
-    'bg-amber-700 active:bg-amber-500 text-white flex items-center justify-center rounded-2xl shadow-lg shadow-amber-900/60 select-none transition-colors border-2 border-amber-500';
-  const btnStyle = { width: '80px', height: '80px', touchAction: 'none' as const };
+    'bg-amber-700 active:bg-amber-500 text-white flex items-center justify-center rounded-2xl shadow-lg shadow-amber-900/60 select-none transition-colors border-2 border-amber-500 touch-manipulation';
+  const btnStyle = { width: '72px', height: '72px', touchAction: 'none' as const, userSelect: 'none' as const };
 
   return (
     <div
       className="grid gap-2"
       style={{
-        gridTemplateColumns: 'repeat(3, 80px)',
-        gridTemplateRows: 'repeat(3, 80px)',
+        gridTemplateColumns: 'repeat(3, 72px)',
+        gridTemplateRows: 'repeat(3, 72px)',
         touchAction: 'none',
       }}
       role="group"
@@ -91,11 +102,15 @@ const TractorGame = () => {
   const [facingRight, setFacingRight] = useState(true);
   const [poppedCrops, setPoppedCrops] = useState<string[]>([]);
   const [visited, setVisited] = useState<Set<string>>(new Set());
+  const moveCountRef = useRef(0);
+  const [finalMoves, setFinalMoves] = useState(0);
+  const [confettiPieces] = useState<ConfettiPiece[]>(makeConfetti);
 
-  const confettiPieces = useMemo(() => CONFETTI_PIECES, []);
+  const { best, submitScore } = useHighScore('tractor', true);
 
   const startGame = useCallback(() => {
     const start = { x: 0, y: 0 };
+    moveCountRef.current = 0;
     setTractorPos(start);
     setFacingRight(true);
     setCrops(generateCrops(start));
@@ -110,6 +125,7 @@ const TractorGame = () => {
       const ny = Math.max(0, Math.min(GRID_SIZE - 1, prev.y + dy));
       if (nx === prev.x && ny === prev.y) return prev;
 
+      moveCountRef.current++;
       const key = `${nx},${ny}`;
       setVisited((v) => new Set([...v, key]));
 
@@ -123,7 +139,14 @@ const TractorGame = () => {
         setTimeout(() => setPoppedCrops((p) => p.filter((k) => k !== key)), 450);
 
         if (next.size === 0) {
-          setTimeout(() => { vibrateVictory(); setGameState('won'); }, 100);
+          setTimeout(() => {
+            vibrateVictory();
+            const moves = moveCountRef.current;
+            const stars = moves <= 12 ? 3 : moves <= 18 ? 2 : 1;
+            submitScore(moves, stars);
+            setFinalMoves(moves);
+            setGameState('won');
+          }, 100);
         }
         return next;
       });
@@ -133,7 +156,7 @@ const TractorGame = () => {
 
     if (dx > 0) setFacingRight(true);
     if (dx < 0) setFacingRight(false);
-  }, []);
+  }, [submitScore]);
 
   useEffect(() => {
     if (gameState !== 'playing') return;
@@ -162,6 +185,11 @@ const TractorGame = () => {
         <p className="text-white/90 text-xl text-center drop-shadow px-4">
           Kør over alle kornet og høst dem!
         </p>
+        {best.bestScore > 0 && (
+          <p className="text-white/70 text-base text-center">
+            Bedst: {best.bestScore} skridt {'⭐'.repeat(best.bestStars)}
+          </p>
+        )}
         <button
           onClick={startGame}
           className="bg-amber-500 hover:bg-amber-400 text-white font-bold text-2xl px-12 py-6 rounded-3xl shadow-xl active:scale-95 transition-transform touch-manipulation"
@@ -177,7 +205,7 @@ const TractorGame = () => {
 
   return (
     <div
-      className="relative flex flex-col items-center w-full h-full select-none overflow-hidden"
+      className="relative flex flex-col w-full h-full select-none overflow-hidden"
       style={{ touchAction: 'none' }}
     >
       {/* Sky + horizon */}
@@ -194,31 +222,32 @@ const TractorGame = () => {
       {/* Barn for atmosphere */}
       <div className="absolute top-2 left-4 text-3xl select-none opacity-70" aria-hidden="true">🏚️</div>
 
-      {/* Counter */}
-      <div className="relative z-10 mt-3 mb-1 bg-amber-950/70 px-5 py-2 rounded-full text-white font-bold text-lg sm:text-xl flex-shrink-0 shadow-lg">
-        🌾 {harvested} / {CROP_COUNT} høstet
+      {/* Counter + progress bar */}
+      <div className="relative z-10 flex flex-col items-center mt-3 mb-2 flex-shrink-0">
+        <div className="bg-amber-950/70 px-5 py-2 rounded-full text-white font-bold text-lg sm:text-xl shadow-lg">
+          🌾 {harvested} / {CROP_COUNT} høstet
+        </div>
+        <div className="w-48 h-3 bg-amber-950/40 rounded-full mt-1 overflow-hidden">
+          <div
+            className="h-full bg-amber-400 rounded-full transition-all duration-300"
+            style={{ width: `${(harvested / CROP_COUNT) * 100}%` }}
+          />
+        </div>
       </div>
 
-      {/* Progress bar */}
-      <div className="relative z-10 w-48 h-3 bg-amber-950/40 rounded-full mb-1 overflow-hidden">
+      {/* Field + D-pad side by side */}
+      <div className="relative z-10 flex flex-row flex-1 items-center justify-center gap-4 px-3 pb-3 min-h-0">
+        {/* Field */}
         <div
-          className="h-full bg-amber-400 rounded-full transition-all duration-300"
-          style={{ width: `${(harvested / CROP_COUNT) * 100}%` }}
-        />
-      </div>
-
-      {/* Field */}
-      <div className="relative z-10 flex-1 flex items-center justify-center w-full px-3">
-        <div
-          className="rounded-2xl overflow-hidden shadow-2xl"
+          className="rounded-2xl overflow-hidden shadow-2xl flex-shrink-0"
           style={{
             display: 'grid',
             gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
             gridTemplateRows: `repeat(${GRID_SIZE}, 1fr)`,
-            width: 'min(86vw, calc(100vh - 330px))',
-            height: 'min(86vw, calc(100vh - 330px))',
+            width: 'min(calc(100vw - 280px), calc(100vh - 210px))',
+            height: 'min(calc(100vw - 280px), calc(100vh - 210px))',
             gap: '3px',
-            backgroundColor: '#451a03', // amber-950 for grid lines
+            backgroundColor: '#451a03',
             border: '4px solid #451a03',
           }}
         >
@@ -286,11 +315,11 @@ const TractorGame = () => {
             );
           })}
         </div>
-      </div>
 
-      {/* D-Pad */}
-      <div className="relative z-10 flex-shrink-0 pb-3 pt-1">
-        <TractorDPad onMove={move} />
+        {/* D-pad to the right of the field */}
+        <div className="flex-shrink-0 flex items-center justify-center">
+          <TractorDPad onMove={move} />
+        </div>
       </div>
 
       {/* Win overlay */}
@@ -312,7 +341,11 @@ const TractorGame = () => {
           ))}
           <span className="text-8xl mb-4 animate-bounce" role="img" aria-label="Fest">🎉</span>
           <h2 className="font-pixel text-lg text-white mb-2 text-center">Høst fuldført!</h2>
-          <p className="text-white/80 text-xl mb-8 text-center">Alle afgrøder er samlet!</p>
+          <p className="text-white/80 text-xl text-center">Alle afgrøder er samlet!</p>
+          <p className="text-white/60 text-base mb-8 text-center">
+            {finalMoves} skridt
+            {best.bestScore > 0 && ` · Bedst: ${best.bestScore}`}
+          </p>
           <button
             onClick={startGame}
             className="bg-amber-500 hover:bg-amber-400 text-white font-bold text-2xl px-12 py-6 rounded-3xl shadow-xl active:scale-95 transition-transform touch-manipulation"

@@ -1,5 +1,6 @@
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { vibrateSuccess, vibrateVictory } from '../../hooks/useVibrate';
+import { useHighScore } from '../../hooks/useHighScore';
 
 type GameState = 'idle' | 'playing' | 'won';
 
@@ -47,13 +48,18 @@ function buildDeck(): Card[] {
 
 // Confetti pieces
 const CONFETTI_COLORS = ['#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#8b5cf6', '#f97316'];
-const CONFETTI_PIECES = Array.from({ length: 28 }, (_, i) => ({
-  key: i,
-  color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-  left: `${Math.random() * 100}%`,
-  delay: `${Math.random() * 1.5}s`,
-  size: `${12 + Math.random() * 10}px`,
-}));
+
+type ConfettiPiece = { key: number; color: string; left: string; delay: string; size: string };
+
+function makeConfetti(): ConfettiPiece[] {
+  return Array.from({ length: 28 }, (_, i) => ({
+    key: i,
+    color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+    left: `${Math.random() * 100}%`,
+    delay: `${Math.random() * 1.5}s`,
+    size: `${12 + Math.random() * 10}px`,
+  }));
+}
 
 const MachinesMemoryGame = () => {
   const [gameState, setGameState] = useState<GameState>('idle');
@@ -62,10 +68,16 @@ const MachinesMemoryGame = () => {
   const [recentMatch, setRecentMatch] = useState<string | null>(null);
   const isLocked = useRef(false);
   const flippedIds = useRef<string[]>([]);
+  const flipAttemptsRef = useRef(0);
+  const [finalAttempts, setFinalAttempts] = useState(0);
+  const [confettiPieces] = useState<ConfettiPiece[]>(makeConfetti);
+
+  const { best, submitScore } = useHighScore('memory-machines', true);
 
   const startGame = useCallback(() => {
     isLocked.current = false;
     flippedIds.current = [];
+    flipAttemptsRef.current = 0;
     setCards(buildDeck());
     setMatchedPairs([]);
     setRecentMatch(null);
@@ -86,6 +98,7 @@ const MachinesMemoryGame = () => {
 
     if (currentFlipped.length === 2) {
       isLocked.current = true;
+      flipAttemptsRef.current++;
       const [firstId, secondId] = currentFlipped;
 
       setTimeout(() => {
@@ -109,6 +122,10 @@ const MachinesMemoryGame = () => {
               const newMatched = [...prevMatched, first.pairKey];
               if (newMatched.length === PAIRS.length) {
                 vibrateVictory();
+                const attempts = flipAttemptsRef.current;
+                const stars = attempts <= 5 ? 3 : attempts <= 7 ? 2 : 1;
+                submitScore(attempts, stars);
+                setFinalAttempts(attempts);
                 setGameState('won');
               }
               return newMatched;
@@ -135,9 +152,8 @@ const MachinesMemoryGame = () => {
         });
       }, 300);
     }
-  }, []);
+  }, [submitScore]);
 
-  const confettiPieces = useMemo(() => CONFETTI_PIECES, []);
 
   // Idle screen
   if (gameState === 'idle') {
@@ -148,6 +164,11 @@ const MachinesMemoryGame = () => {
           Maskiner Memory
         </h2>
         <p className="text-white/80 text-xl text-center">Find de ens maskiner!</p>
+        {best.bestScore > 0 && (
+          <p className="text-white/60 text-base text-center">
+            Bedst: {best.bestScore} træk {'⭐'.repeat(best.bestStars)}
+          </p>
+        )}
         <button
           onClick={startGame}
           className="bg-orange-400 hover:bg-orange-300 text-white font-bold text-2xl px-12 py-6 rounded-3xl shadow-xl active:scale-95 transition-transform touch-manipulation"
@@ -265,7 +286,11 @@ const MachinesMemoryGame = () => {
           ))}
           <span className="text-8xl mb-4 animate-bounce" role="img" aria-label="Fest">🎉</span>
           <h2 className="font-pixel text-lg text-white mb-2 text-center">Du vandt!</h2>
-          <p className="text-white/80 text-xl mb-8 text-center">Alle maskiner fundet!</p>
+          <p className="text-white/80 text-xl text-center">Alle maskiner fundet!</p>
+          <p className="text-white/60 text-base mb-8 text-center">
+            {finalAttempts} træk
+            {best.bestScore > 0 && ` · Bedst: ${best.bestScore}`}
+          </p>
           <button
             onClick={startGame}
             className="bg-orange-400 hover:bg-orange-300 text-white font-bold text-2xl px-12 py-6 rounded-3xl shadow-xl active:scale-95 transition-transform touch-manipulation"

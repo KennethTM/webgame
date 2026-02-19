@@ -19,11 +19,11 @@ const Arrow = ({ d }: { d: string }) => (
 );
 
 const DPad = ({ onUp, onDown, onLeft, onRight, accentColor, center }: DPadProps) => {
-  const touchedRef = useRef(false);
+  const lastTouchRef = useRef(0);
 
   const handle = (fn: () => void) => ({
-    onTouchStart: (e: React.TouchEvent) => { e.preventDefault(); touchedRef.current = true; fn(); },
-    onMouseDown: () => { if (!touchedRef.current) fn(); },
+    onTouchStart: (e: React.TouchEvent) => { e.preventDefault(); lastTouchRef.current = Date.now(); fn(); },
+    onMouseDown: () => { if (Date.now() - lastTouchRef.current > 400) fn(); },
     onContextMenu: (e: React.MouseEvent) => e.preventDefault(),
   });
 
